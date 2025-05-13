@@ -1,36 +1,7 @@
-const fs = require('fs');
-const read_json = require("./readJSON");
-const path = require('path');
+const { faker } = require('@faker-js/faker');
 
-// Description: This script generates random user data for testing purposes.
-
-
-const firstNames_filePath = path.join(__dirname, '../data/firstNames.json');
-const lastNames_filePath = path.join(__dirname, '../data/lastNames.json');
-const domains_filePath = path.join(__dirname, '../data/domains.json');
-const cities_filePath = path.join(__dirname, '../data/cities.json');
-const streetNames_filePath = path.join(__dirname, '../data/streetNames.json');
-const streetTypes_filePath = path.join(__dirname, '../data/streetTypes.json');
-const jobTitles_filePath = path.join(__dirname, '../data/jobTitles.json');
-const states_filePath = path.join(__dirname, '../data/states.json');
-
+// Function to generate random user data
 function generateRandomUsers(count = 100) {
-  // Read JSON files
-  const firstNames = read_json.readJSONFile(firstNames_filePath);
-
-  const lastNames = read_json.readJSONFile(lastNames_filePath);
-
-  const domains = read_json.readJSONFile(domains_filePath);
-
-  const cities = read_json.readJSONFile(cities_filePath);
-
-  const states = read_json.readJSONFile(states_filePath);
-
-  const jobTitles = read_json.readJSONFile(jobTitles_filePath);
-
-  const streetNames = read_json.readJSONFile(streetNames_filePath);
-
-  const streetTypes = read_json.readJSONFile(streetTypes_filePath);
 
   // Helper function to get random element from array
   const getRandomElement = (array) => array[Math.floor(Math.random() * array.length)];
@@ -56,22 +27,14 @@ function generateRandomUsers(count = 100) {
     return birthDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   };
 
-  // Helper function to generate random phone number
-  const generatePhoneNumber = () => {
-    const areaCode = getRandomNumber(100, 999);
-    const prefix = getRandomNumber(100, 999);
-    const lineNumber = getRandomNumber(1000, 9999);
-    return `${areaCode}-${prefix}-${lineNumber}`;
-  };
-
   // Generate users
   const users = [];
 
   for (let i = 0; i < count; i++) {
-    const firstName = getRandomElement(firstNames);
-    const lastName = getRandomElement(lastNames);
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
     const username = `${firstName.toLowerCase()}${lastName.toLowerCase()}${getRandomNumber(1, 999)}`;
-    const email = `${username}@${getRandomElement(domains)}`;
+    const email = `${username}@${faker.internet.domainName()}`;
 
     const user = {
       id: i + 1,
@@ -82,20 +45,26 @@ function generateRandomUsers(count = 100) {
       lastName: lastName,
       birthDate: getRandomBirthDate(),
       address: {
-        street: `${getRandomNumber(100, 9999)} ${getRandomElement(streetNames)} ${getRandomElement(streetTypes)}`,
-        city: getRandomElement(cities),
-        state: getRandomElement(states),
+        street: faker.location.streetAddress(),
+        city: faker.location.city(),
+        state: faker.location.state({ abbreviated: true }),
         zipCode: getRandomNumber(10000, 99999).toString(),
-        country: 'USA'
+        country: faker.location.countryCode('alpha-2')
       },
-      phoneNumber: generatePhoneNumber(),
-      occupation: getRandomElement(jobTitles),
+      phoneNumber: faker.phone.number({ style: 'international' }),
+      occupation: faker.person.jobTitle(),
       registeredAt: new Date(Date.now() - getRandomNumber(86400000, 86400000 * 365 * 5)).toISOString(), // Between now and 5 years ago
       isActive: Math.random() > 0.2, // 80% chance of being active
       preferences: {
         theme: getRandomElement(['light', 'dark', 'system']),
         notifications: Math.random() > 0.3, // 70% chance of having notifications enabled
         language: getRandomElement(['en-US', 'en-GB', 'es-ES', 'fr-FR', 'de-DE'])
+      },
+      vehicle_info:{
+        make: faker.vehicle.manufacturer(),
+        model: faker.vehicle.model(),
+        year: getRandomNumber(2000, 2023),
+        vin: faker.vehicle.vin()
       }
     };
 
