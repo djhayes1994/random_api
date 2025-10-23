@@ -21,3 +21,7 @@ app.get('/users', (req, res) => {
     const randomUsers = users.generateRandomUsers(count);
     res.json(randomUsers);
 });
+
+app.get('/bigint', (req, res) => {
+    res.status(200).json({"value": -92233720368554776000});
+});
